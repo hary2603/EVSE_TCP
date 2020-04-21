@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Compiler Value="C:\lazarus\fpc\3.0.4\bin\x86_64-win64\fpc.exe" Date="1351329191"/>
+  <Params Value=" -MObjFPC -Scgi -O2 -Xs -XX -WG -l -vewnhibq -FuC:\Users\User\AppData\Local\lazarus\onlinepackagemanager\packages\lnet\lazaruspackage\lib\x86_64-win64 -FuC:\lazarus\components\ideintf\units\x86_64-win64\win32 -FuC:\lazarus\components\lazcontrols\lib\x86_64-win64\win32 -FuC:\lazarus\lcl\units\x86_64-win64\win32 -FuC:\lazarus\lcl\units\x86_64-win64 -FuC:\lazarus\components\lazutils\lib\x86_64-win64 -FuC:\lazarus\packager\units\x86_64-win64 -FuC:\Users\User\Desktop\evse_tcp\ -oC:\Users\User\Desktop\evse_tcp\EVSE_CLIENT.exe -dLCL -dLCLwin32 EVSE_CLIENT.lpr"/>
+</CONFIG>
