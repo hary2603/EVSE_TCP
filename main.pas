@@ -10,12 +10,11 @@ uses
 
 type
 
-  TChargeStatus = (stInit,st1,st2,st3,stInvalid);
+  TChargeStatus = (st_Init,st_ready,st_connected,st_charging,st_error,st_standby,st_Invalid);
 
   { TFormMain }
 
   TFormMain = class(TForm)
-    Button1: TButton;
     ButtonDiconnect: TButton;
     ButtonConnect: TButton;
     Connected: TImage;
@@ -33,9 +32,8 @@ type
     ButtonSend: TButton;
     EditSend: TEdit;
     MemoText: TMemo;
-    TimerX: TTimer;
+    TimerUpdate: TTimer;
     TimerQuit: TTimer;
-    procedure Button1Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormPaint(Sender: TObject);
     procedure ReadyClick(Sender: TObject);
@@ -52,7 +50,7 @@ type
     procedure SendButtonClick(Sender: TObject);
     procedure SendEditKeyPress(Sender: TObject; var Key: char);
     procedure TimerQuitTimer(Sender: TObject);
-    procedure TimerXTimer(Sender: TObject);
+    procedure TimerUpdateTimer(Sender: TObject);
   private
     FNet: TLConnection;
     FIsServer: Boolean;
@@ -98,19 +96,14 @@ begin
   end;
 end;
 
-procedure TFormMain.Button1Click(Sender: TObject);
-begin
-  inc(FChargeStatus);
-  Refresh;
-end;
 
 procedure TFormMain.FormPaint(Sender: TObject);
 begin
   //
   Case ChargeStatus of
-    st1: Canvas.Draw(0,0,Ready.Picture.Bitmap);
-    st2: Canvas.Draw(0,0,Connected.Picture.Bitmap);
-    st3: Canvas.Draw(0,0,Charging.Picture.Bitmap);
+    st_ready: Canvas.Draw(0,0,Ready.Picture.Bitmap);
+    st_connected: Canvas.Draw(0,0,Connected.Picture.Bitmap);
+    st_charging: Canvas.Draw(0,0,Charging.Picture.Bitmap);
   end;
 end;
 
@@ -169,25 +162,27 @@ begin
         case l of
            '$ST 01': begin
                  MemoText.Append('Status: Bereit');
-                 ChargeStatus := st1;
+                 ChargeStatus := st_ready;
                  //Canvas.Draw(0,0,Ready.Picture.Bitmap);
            end;
            '$ST 02': begin
                 MemoText.Append('Status: Verbunden');
-                ChargeStatus := st2;
+                ChargeStatus := st_connected;
                 //Canvas.Draw(0,0,Connected.Picture.Bitmap);
            end;
            '$ST 03': begin
                  MemoText.Append('Status: Laden');
-                 ChargeStatus := st3;
+                 ChargeStatus := st_charging;
                  //Canvas.Draw(0,0,Charging.Picture.Bitmap);
            end;
            '$ST 04','$ST 05': begin
                 MemoText.Append('Status: Fehler');
+                ChargeStatus := st_error;
                 //Canvas.Draw(0,0,Error.Picture.Bitmap);
            end;
            '$ST fe': begin
                 MemoText.Append('Status: Pause');
+                ChargeStatus := st_standby;
                 //Canvas.Draw(0,0,Standby.Picture.Bitmap);
            end;
            otherwise begin
@@ -201,18 +196,6 @@ begin
      end;
 
     MemoText.SelStart := Length(MemoText.Lines.Text);
-
-    if s = '$ST 02^01' then
-      begin
-         MemoText.Append('Verbunden');
-         Canvas.Draw(0,50,Status.Picture.Bitmap);
-      end;
-
-//    if FNet is TLUdp then begin // echo to sender if UDP
-//      if FIsServer then
-//        FNet.SendMessage(s);
-//    end else if FIsServer then // echo to all if TCP
-//      SendToAll(s);
   end;
 end;
 
@@ -232,12 +215,6 @@ procedure TFormMain.MenuItemExitClick(Sender: TObject);
 begin
   Close;
 end;
-
-
-
-
-
-
 
 
 
@@ -269,15 +246,12 @@ end;
 
 procedure TFormMain.FormCreate(Sender: TObject);
 begin
- // FNet.Disconnect;
   FNet := LTCP;
   LTCP.SocketNet := LAF_INET;
   if EditIP.Text = '::1' then
     EditIP.Text := 'localhost';
   FIsServer := False;
- // SSL.SSLActive := False;
-//  Canvas.Draw(0,0,Status.Picture.Bitmap);
-  FChargeStatus := st1;
+  FChargeStatus := st_ready;
 end;
 
 
@@ -292,13 +266,17 @@ begin
   Close;
 end;
 
-procedure TFormMain.TimerXTimer(Sender: TObject);
+procedure TFormMain.TimerUpdateTimer(Sender: TObject);
 begin
-   ChargeStatus := TChargeStatus(Ord(ChargeStatus)+1);
-   Label1.Caption := DateTimeToStr(now());
 
-  if ChargeStatus=stInvalid then
-    ChargeStatus := stInit;
+//   testing only
+
+     Label1.Caption := DateTimeToStr(now());
+
+//   ChargeStatus := TChargeStatus(Ord(ChargeStatus)+1);
+//   if ChargeStatus=st_Invalid then
+//    ChargeStatus := st_Init;
+
 end;
 
 procedure TFormMain.SendToAll(const aMsg: string);
