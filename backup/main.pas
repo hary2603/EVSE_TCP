@@ -6,17 +6,21 @@ interface
 
 uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, Buttons, ExtCtrls, Menus, lNetComponents, lNet,syncobjs;
+  StdCtrls, Buttons, ExtCtrls, Menus, lNetComponents, lNet;
 
 type
+
+  TChargeStatus = (stInit,st1,st2,st3,stInvalid);
 
   { TFormMain }
 
   TFormMain = class(TForm)
+    Button1: TButton;
     ButtonDiconnect: TButton;
     ButtonConnect: TButton;
     Connected: TImage;
     Error: TImage;
+    Label1: TLabel;
     Standby: TImage;
     Ready: TImage;
     Charging: TImage;
@@ -29,8 +33,11 @@ type
     ButtonSend: TButton;
     EditSend: TEdit;
     MemoText: TMemo;
+    TimerX: TTimer;
     TimerQuit: TTimer;
+    procedure Button1Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+    procedure FormPaint(Sender: TObject);
     procedure ReadyClick(Sender: TObject);
     procedure LTCPComponentConnect(aSocket: TLSocket);
     procedure ConnectButtonClick(Sender: TObject);
@@ -45,11 +52,15 @@ type
     procedure SendButtonClick(Sender: TObject);
     procedure SendEditKeyPress(Sender: TObject; var Key: char);
     procedure TimerQuitTimer(Sender: TObject);
+    procedure TimerXTimer(Sender: TObject);
   private
     FNet: TLConnection;
     FIsServer: Boolean;
+    FChargeStatus : TChargeStatus;
     procedure SendToAll(const aMsg: string);
+    procedure SetChargeStatus(AValue: TChargeStatus);
   public
+    property ChargeStatus:TChargeStatus read FChargeStatus write SetChargeStatus;
     { public declarations }
   end; 
 
@@ -84,6 +95,22 @@ begin
     CloseAction := caNone; // make sure we quit gracefuly
     FNet.Disconnect; // call disconnect (soft)
     TimerQuit.Enabled := True; // if time runs out, quit ungracefully
+  end;
+end;
+
+procedure TFormMain.Button1Click(Sender: TObject);
+begin
+  inc(FChargeStatus);
+  Refresh;
+end;
+
+procedure TFormMain.FormPaint(Sender: TObject);
+begin
+  //
+  Case ChargeStatus of
+    st1: Canvas.Draw(0,0,Ready.Picture.Bitmap);
+    st2: Canvas.Draw(0,0,Connected.Picture.Bitmap);
+    st3: Canvas.Draw(0,0,Charging.Picture.Bitmap);
   end;
 end;
 
@@ -142,23 +169,26 @@ begin
         case l of
            '$ST 01': begin
                  MemoText.Append('Status: Bereit');
-                 Canvas.Draw(0,0,Ready.Picture.Bitmap);
+                 ChargeStatus := st1;
+                 //Canvas.Draw(0,0,Ready.Picture.Bitmap);
            end;
            '$ST 02': begin
                 MemoText.Append('Status: Verbunden');
-                Canvas.Draw(0,0,Connected.Picture.Bitmap);
+                ChargeStatus := st2;
+                //Canvas.Draw(0,0,Connected.Picture.Bitmap);
            end;
            '$ST 03': begin
                  MemoText.Append('Status: Laden');
-                 Canvas.Draw(0,0,Charging.Picture.Bitmap);
+                 ChargeStatus := st3;
+                 //Canvas.Draw(0,0,Charging.Picture.Bitmap);
            end;
            '$ST 04','$ST 05': begin
                 MemoText.Append('Status: Fehler');
-                Canvas.Draw(0,0,Error.Picture.Bitmap);
+                //Canvas.Draw(0,0,Error.Picture.Bitmap);
            end;
            '$ST fe': begin
                 MemoText.Append('Status: Pause');
-                Canvas.Draw(0,0,Standby.Picture.Bitmap);
+                //Canvas.Draw(0,0,Standby.Picture.Bitmap);
            end;
            otherwise begin
                 MemoText.Append('?????');
@@ -246,7 +276,8 @@ begin
     EditIP.Text := 'localhost';
   FIsServer := False;
  // SSL.SSLActive := False;
-  Canvas.Draw(0,0,Status.Picture.Bitmap);
+//  Canvas.Draw(0,0,Status.Picture.Bitmap);
+  FChargeStatus := st1;
 end;
 
 
@@ -261,6 +292,15 @@ begin
   Close;
 end;
 
+procedure TFormMain.TimerXTimer(Sender: TObject);
+begin
+   ChargeStatus := TChargeStatus(Ord(ChargeStatus)+1);
+   Label1.Caption := DateTimeToStr(now());
+
+  if ChargeStatus=stInvalid then
+    ChargeStatus := stInit;
+end;
+
 procedure TFormMain.SendToAll(const aMsg: string);
 var
   n: Integer;
@@ -273,6 +313,12 @@ begin
         MemoText.Append('Error on send [' + IntToStr(n) + ']');
     end;
  end;
+
+procedure TFormMain.SetChargeStatus(AValue: TChargeStatus);
+begin
+  FChargeStatus:=AValue;
+  Refresh;
+end;
 
 initialization
   {$I main.lrs}
