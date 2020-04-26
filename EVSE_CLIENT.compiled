@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<CONFIG>
-  <Compiler Value="/home/helly/fpcupdeluxe/fpc/bin/x86_64-linux/fpc.sh" Date="1587917242"/>
-  <Params Value=" -MObjFPC -Scgi -Cg -O2 -g -Xs -XX -l -vewnhibq -Fu/home/helly/fpcupdeluxe/config_lazarus/onlinepackagemanager/packages/lnet/lazaruspackage/lib/x86_64-linux -Fu/home/helly/fpcupdeluxe/lazarus/components/ideintf/units/x86_64-linux/gtk2 -Fu/home/helly/fpcupdeluxe/lazarus/components/lazcontrols/lib/x86_64-linux/gtk2 -Fu/home/helly/fpcupdeluxe/lazarus/lcl/units/x86_64-linux/gtk2 -Fu/home/helly/fpcupdeluxe/lazarus/lcl/units/x86_64-linux -Fu/home/helly/fpcupdeluxe/lazarus/components/lazutils/lib/x86_64-linux -Fu/home/helly/fpcupdeluxe/lazarus/packager/units/x86_64-linux -Fu/home/helly/repos/EVSE_TCP/ -o/home/helly/repos/EVSE_TCP/EVSE_CLIENT -dLCL -dLCLgtk2 EVSE_CLIENT.lpr"/>
-</CONFIG>
