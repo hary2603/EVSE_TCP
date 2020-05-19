@@ -15,6 +15,7 @@ type
   { TFormMain }
 
   TFormMain = class(TForm)
+    TESTCMD: TButton;
     ButtonDiconnect: TButton;
     ButtonConnect: TButton;
     Connected: TImage;
@@ -49,6 +50,7 @@ type
     procedure MenuItemExitClick(Sender: TObject);
     procedure SendButtonClick(Sender: TObject);
     procedure SendEditKeyPress(Sender: TObject; var Key: char);
+    procedure TESTCMDClick(Sender: TObject);
     procedure TimerQuitTimer(Sender: TObject);
     procedure TimerUpdateTimer(Sender: TObject);
   private
@@ -64,6 +66,15 @@ type
 
 var
   FormMain: TFormMain;
+  last_cmd: string;
+  set_current: string;
+  act_state: string;
+  act_current: string;
+  act_temp: string;
+  energy_session: string;
+  elapsed_time: string;
+  energy_tot:string;
+  temp: string;
 
 implementation
 
@@ -82,7 +93,6 @@ end;
 procedure TFormMain.LTCPComponentConnect(aSocket: TLSocket);
 begin
   MemoText.Append('Connected to remote host');
-
 end;
 
 procedure TFormMain.FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -106,6 +116,8 @@ begin
     st_charging: Canvas.Draw(0,0,Charging.Picture.Bitmap);
   end;
 end;
+
+
 
 procedure TFormMain.ReadyClick(Sender: TObject);
 begin
@@ -138,67 +150,6 @@ begin
 end;
 
 
-
-procedure TFormMain.LTCPComponentReceive(aSocket: TLSocket);
-var
-  s,l,r,rec_cs,calc_cs: string;
-  len: Int64;
-
-begin
-  if aSocket.GetMessage(s) > 0 then begin
-    MemoText.Append(s);
-//    MemoText.Append(IntToStr(Length(s)));
-    len := Length(s) - 4;    // Commando length without checksum
-    l := LeftStr(s,len);     // Commando String $cc pp pp ...
-    r := RightStr(s,3);      // Checksum String xk\r
-    rec_cs := LeftStr(r,2);  // received Checksum String
-    calc_cs := CRC(l);       // calculated Checksum String
-//    MemoText.Append(l);
-//    MemoText.Append(rec_cs);
-//    MemoText.Append(calc_cs);
-    if rec_cs = calc_cs then  // Antwort verarbeiten
-      begin
-
-        case l of
-           '$ST 01': begin
-                 MemoText.Append('Status: Bereit');
-                 ChargeStatus := st_ready;
-                 //Canvas.Draw(0,0,Ready.Picture.Bitmap);
-           end;
-           '$ST 02': begin
-                MemoText.Append('Status: Verbunden');
-                ChargeStatus := st_connected;
-                //Canvas.Draw(0,0,Connected.Picture.Bitmap);
-           end;
-           '$ST 03': begin
-                 MemoText.Append('Status: Laden');
-                 ChargeStatus := st_charging;
-                 //Canvas.Draw(0,0,Charging.Picture.Bitmap);
-           end;
-           '$ST 04','$ST 05': begin
-                MemoText.Append('Status: Fehler');
-                ChargeStatus := st_error;
-                //Canvas.Draw(0,0,Error.Picture.Bitmap);
-           end;
-           '$ST fe': begin
-                MemoText.Append('Status: Pause');
-                ChargeStatus := st_standby;
-                //Canvas.Draw(0,0,Standby.Picture.Bitmap);
-           end;
-           otherwise begin
-                MemoText.Append('?????');
-           end;
-        end;
-      end
-    else
-     begin
-       MemoText.Append('Checksum error....');
-     end;
-
-    MemoText.SelStart := Length(MemoText.Lines.Text);
-  end;
-end;
-
 procedure TFormMain.LTcpComponentDisconnect(aSocket: TLSocket);
 begin
   MemoText.Append('Connection lost');
@@ -217,22 +168,125 @@ begin
 end;
 
 
+function build_cmd_str(cmd_in: AnsiString): AnsiString; // generate command string
+begin
+ cmd_in := '$' + cmd_in;
+ Result := cmd_in + '^' + CRC(cmd_in) + #13;
+end;
+
+
 
 procedure TFormMain.SendButtonClick(Sender: TObject);
-var str : AnsiString;
-var checksum : AnsiString;
-
 begin
   if Length(EditSend.Text) > 0 then begin
     if FNet.Connected then begin
-       EditSend.Text := '$' + EditSend.Text;
-       str :=  EditSend.Text;
-       checksum := CRC(str);
-       EditSend.Text := EditSend.Text + '^' + checksum + #13;
+       last_cmd := EditSend.Text;  // remember last command sent
+       EditSend.Text := build_cmd_str(EditSend.Text);
        MemoText.Append(EditSend.Text);
        FNet.SendMessage(EditSend.Text);
        EditSend.Text := '';
     end;
+  end;
+end;
+
+procedure TFormMain.TESTCMDClick(Sender: TObject);
+var str : AnsiString;
+begin
+ str := 'SC 10';
+ last_cmd := str;
+ str := build_cmd_str(str);
+ FNet.SendMessage(str);
+ str := '';
+end;
+
+
+procedure TFormMain.LTCPComponentReceive(aSocket: TLSocket);
+var
+  s,l,r,rec_cs,calc_cs,la,ppblock,cmd: string;
+  pp: TStringArray;
+  len: Int64;
+
+begin
+  if aSocket.GetMessage(s) > 0 then begin
+    MemoText.Append(s);
+
+//    MemoText.Append(IntToStr(Length(s)));
+    len := Length(s) - 4;    // Commando length without checksum
+    l := LeftStr(s,len);     // Commando String $cc pp pp ...
+    r := RightStr(s,3);      // Checksum String xk\r
+    rec_cs := LeftStr(r,2);  // received Checksum String
+    calc_cs := CRC(l);       // calculated Checksum String
+//    MemoText.Append(l);
+//    MemoText.Append(rec_cs);
+//    MemoText.Append(calc_cs);
+    if rec_cs = calc_cs then  // Antwort verarbeiten
+      begin
+        case l of
+           '$ST 01': begin
+                 MemoText.Append('Status: Bereit');
+                 ChargeStatus := st_ready;
+           end;
+           '$ST 02': begin
+                MemoText.Append('Status: Verbunden');
+                ChargeStatus := st_connected;
+           end;
+           '$ST 03': begin
+                 MemoText.Append('Status: Laden');
+                 ChargeStatus := st_charging;
+           end;
+           '$ST 04','$ST 05': begin
+                MemoText.Append('Status: Fehler');
+                ChargeStatus := st_error;
+           end;
+           '$ST fe': begin
+                MemoText.Append('Status: Pause');
+                ChargeStatus := st_standby;
+           end;
+           otherwise begin
+           la := LeftStr(l,3);
+           if la = '$OK' then
+             begin
+              len := Length(l) - 3;
+              ppblock := RightStr(l,len);
+              pp := ppblock.Split(' ');            // array of parameters
+              len := high(pp);                     // number of parameters
+              MemoText.Append(ppblock + ' received ' + IntToStr(len));
+              cmd := Leftstr(last_cmd,2);          // limit to command name
+              MemoText.Append('try ' + cmd);
+              case cmd of
+                 'SC':begin                        // set current
+                   set_current := pp[1];
+                   MemoText.Append('Current setting: ' +  set_current);
+                 end;
+                 'GG':begin                        // get actual current
+                    act_current := pp[1];
+                    MemoText.Append('Current: ' +  act_current);
+                 end;
+                 'GS':begin                        // get actual state and elapsed time
+                    act_state := pp[1];
+                    elapsed_time := pp[2];
+                    MemoText.Append('State: ' +  act_state + ' Session Time: ' + elapsed_time);
+                 end;
+                 'GP':begin                        // get temperature
+                    act_temp := pp[1];
+                    MemoText.Append('Temperature: ' +  act_temp);
+                 end;
+                  'GU':begin                       // get energy usage
+                    energy_session := pp[1];
+                    energy_tot := pp[2];
+                    MemoText.Append('Energy Session: ' +  energy_session + ' Total: ' + energy_tot);
+                 end;
+              end;
+             end else  MemoText.Append('?????');
+           end;
+        end;
+      end
+    else
+     begin
+       MemoText.Append('Checksum error....');
+     end;
+
+    MemoText.SelStart := Length(MemoText.Lines.Text);
   end;
 end;
 
@@ -260,6 +314,8 @@ begin
   if Key = #13 then
     SendButtonClick(Sender);
 end;
+
+
 
 procedure TFormMain.TimerQuitTimer(Sender: TObject);
 begin
