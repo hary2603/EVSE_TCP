@@ -1,11 +1,16 @@
 object FormMain: TFormMain
-  Left = 1125
-  Height = 540
-  Top = 190
+  Left = 2235
+  Height = 428
+  Top = 166
   Width = 390
+  HorzScrollBar.Page = 377
+  HorzScrollBar.Range = 377
+  VertScrollBar.Page = 459
+  VertScrollBar.Range = 459
   ActiveControl = EditPort
+  BorderWidth = 1
   Caption = 'EVSE CONTROL'
-  ClientHeight = 540
+  ClientHeight = 428
   ClientWidth = 390
   Constraints.MaxWidth = 390
   Constraints.MinHeight = 400
@@ -17,7 +22,7 @@ object FormMain: TFormMain
   object LabelPort: TLabel
     Left = 37
     Height = 13
-    Top = 262
+    Top = 222
     Width = 24
     Caption = 'Port:'
     ParentColor = False
@@ -26,7 +31,7 @@ object FormMain: TFormMain
   object LabelHostName: TLabel
     Left = 37
     Height = 13
-    Top = 235
+    Top = 195
     Width = 52
     Caption = 'Hostname:'
     ParentColor = False
@@ -34,9 +39,10 @@ object FormMain: TFormMain
   end
   object MemoText: TMemo
     Left = 40
-    Height = 176
-    Top = 291
+    Height = 141
+    Top = 251
     Width = 280
+    Enabled = False
     ParentFont = False
     ReadOnly = True
     ScrollBars = ssAutoBoth
@@ -45,7 +51,7 @@ object FormMain: TFormMain
   object ButtonSend: TButton
     Left = 245
     Height = 25
-    Top = 473
+    Top = 400
     Width = 75
     BorderSpacing.InnerBorder = 4
     Caption = 'Send'
@@ -56,7 +62,7 @@ object FormMain: TFormMain
   object EditSend: TEdit
     Left = 40
     Height = 21
-    Top = 475
+    Top = 400
     Width = 200
     OnKeyPress = SendEditKeyPress
     ParentFont = False
@@ -65,7 +71,7 @@ object FormMain: TFormMain
   object ButtonConnect: TButton
     Left = 40
     Height = 25
-    Top = 507
+    Top = 433
     Width = 75
     BorderSpacing.InnerBorder = 4
     Caption = 'Connect'
@@ -74,9 +80,9 @@ object FormMain: TFormMain
     TabOrder = 3
   end
   object ButtonDiconnect: TButton
-    Left = 120
+    Left = 128
     Height = 25
-    Top = 507
+    Top = 433
     Width = 104
     BorderSpacing.InnerBorder = 4
     Caption = 'Disconnect'
@@ -87,7 +93,7 @@ object FormMain: TFormMain
   object EditPort: TEdit
     Left = 117
     Height = 21
-    Top = 259
+    Top = 219
     Width = 59
     ParentFont = False
     TabOrder = 5
@@ -96,17 +102,17 @@ object FormMain: TFormMain
   object EditIP: TEdit
     Left = 117
     Height = 21
-    Top = 232
+    Top = 192
     Width = 123
     ParentFont = False
     TabOrder = 6
     Text = '10.0.0.170'
   end
   object Status: TImage
-    Left = 296
-    Height = 32
-    Top = 24
-    Width = 72
+    Left = 279
+    Height = 24
+    Top = 432
+    Width = 24
     Picture.Data = {
       1754506F727461626C654E6574776F726B477261706869639301000089504E47
       0D0A1A0A0000000D49484452000000190000001908020000004B8B1234000000
@@ -123,11 +129,13 @@ object FormMain: TFormMain
       E922BC0486A27187B5B412497211FECC3EA7337C71A9F89D0B78024612FD0DC3
       1AA6F90000000049454E44AE426082
     }
+    Transparent = True
+    Visible = False
   end
   object Charging: TImage
     Left = 334
     Height = 32
-    Top = 352
+    Top = 344
     Width = 40
     Picture.Data = {
       1754506F727461626C654E6574776F726B477261706869636002000089504E47
@@ -151,14 +159,14 @@ object FormMain: TFormMain
       066713302B9C482EA3D1A8EA79EF2F2FBA4DF58D4400908D468366E689F3A609
       8FDCAE5E5292249F822087B7EB8BA5FC0000000049454E44AE426082
     }
+    Transparent = True
     Visible = False
   end
   object Ready: TImage
-    Left = 334
+    Left = 336
     Height = 32
-    Top = 264
+    Top = 256
     Width = 40
-    OnClick = ReadyClick
     Picture.Data = {
       1754506F727461626C654E6574776F726B477261706869632D02000089504E47
       0D0A1A0A0000000D4948445200000013000000130802000000FD32A19B000000
@@ -180,12 +188,13 @@ object FormMain: TFormMain
       C30DDD98DBA7D7CBEB9B5AADC69B14DE5B076BBF006AEC30288604EA38000000
       0049454E44AE426082
     }
+    Transparent = True
     Visible = False
   end
   object Connected: TImage
-    Left = 334
+    Left = 336
     Height = 32
-    Top = 312
+    Top = 304
     Width = 40
     Picture.Data = {
       1754506F727461626C654E6574776F726B477261706869634602000089504E47
@@ -209,12 +218,13 @@ object FormMain: TFormMain
       AF890709B88DC74DD9B7A312C77F86C82FD6C4FE227D0000000049454E44AE42
       6082
     }
+    Transparent = True
     Visible = False
   end
   object Error: TImage
-    Left = 334
+    Left = 336
     Height = 32
-    Top = 392
+    Top = 384
     Width = 40
     Picture.Data = {
       1754506F727461626C654E6574776F726B477261706869635F03000089504E47
@@ -248,10 +258,19 @@ object FormMain: TFormMain
     }
     Visible = False
   end
+  object set_10A: TButton
+    Left = 37
+    Height = 25
+    Top = 112
+    Width = 75
+    Caption = '10A'
+    OnClick = set_10AClick
+    TabOrder = 7
+  end
   object Standby: TImage
     Left = 334
     Height = 32
-    Top = 432
+    Top = 426
     Width = 40
     Picture.Data = {
       1754506F727461626C654E6574776F726B47726170686963D101000089504E47
@@ -273,28 +292,154 @@ object FormMain: TFormMain
     }
     Visible = False
   end
-  object Label1: TLabel
-    Left = 16
-    Height = 40
-    Top = 24
-    Width = 111
-    Caption = 'Label1'
+  object wallbox_state: TLabel
+    Left = 30
+    Height = 1
+    Top = 10
+    Width = 1
     Color = clMaroon
+    Font.CharSet = ANSI_CHARSET
     Font.Color = clWhite
-    Font.Height = 40
+    Font.Height = -24
+    Font.Name = 'CourierPS'
+    Font.Pitch = fpFixed
+    Font.Quality = fqDraft
     Font.Style = [fsBold]
     ParentColor = False
     ParentFont = False
     Transparent = False
   end
-  object TESTCMD: TButton
-    Left = 16
+  object current_act: TLabel
+    Left = 143
+    Height = 23
+    Top = 40
+    Width = 73
+    Caption = '10.30 A'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -19
+    Font.Name = 'Tahoma'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object current_set: TLabel
+    Left = 143
+    Height = 23
+    Top = 80
+    Width = 43
+    Caption = '10 A'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -19
+    Font.Name = 'Tahoma'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object energy: TLabel
+    Left = 239
+    Height = 23
+    Top = 40
+    Width = 103
+    Caption = '00.00 kWh'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -19
+    Font.Name = 'Tahoma'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object energy_total: TLabel
+    Left = 227
+    Height = 23
+    Top = 80
+    Width = 115
+    Caption = '000.00 kWh'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -19
+    Font.Name = 'Tahoma'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object temperature: TLabel
+    Left = 37
+    Height = 23
+    Top = 80
+    Width = 71
+    Caption = '00.0 °C'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -19
+    Font.Name = 'Tahoma'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object charging_time: TLabel
+    Left = 37
+    Height = 23
+    Top = 40
+    Width = 86
+    Caption = '00:00:00'
+    Font.CharSet = ANSI_CHARSET
+    Font.Color = clBlack
+    Font.Height = -19
+    Font.Name = 'Tahoma'
+    Font.Pitch = fpVariable
+    Font.Quality = fqDraft
+    Font.Style = [fsBold]
+    ParentColor = False
+    ParentFont = False
+  end
+  object set12A: TButton
+    Left = 119
     Height = 25
-    Top = 104
+    Top = 112
     Width = 75
-    Caption = 'TESTCMD'
-    OnClick = TESTCMDClick
-    TabOrder = 7
+    Caption = '12A'
+    OnClick = set12AClick
+    TabOrder = 8
+  end
+  object set16A: TButton
+    Left = 199
+    Height = 25
+    Top = 112
+    Width = 75
+    Caption = '16A'
+    OnClick = set16AClick
+    TabOrder = 9
+  end
+  object set20A: TButton
+    Left = 279
+    Height = 25
+    Top = 112
+    Width = 75
+    Caption = '20A'
+    OnClick = set20AClick
+    TabOrder = 10
+  end
+  object pause: TButton
+    Left = 37
+    Height = 26
+    Top = 152
+    Width = 316
+    Caption = 'Pause'
+    OnClick = pauseClick
+    TabOrder = 11
   end
   object LTCP: TLTCPComponent
     Port = 0
@@ -305,20 +450,19 @@ object FormMain: TFormMain
     OnAccept = LTCPComponentAccept
     Timeout = 0
     ReuseAddress = True
-    left = 280
-    top = 216
+    left = 248
+    top = 192
   end
   object TimerQuit: TTimer
     Enabled = False
     Interval = 200
     OnTimer = TimerQuitTimer
-    left = 328
-    top = 216
+    left = 288
+    top = 192
   end
   object TimerUpdate: TTimer
-    Interval = 100
     OnTimer = TimerUpdateTimer
-    left = 328
-    top = 168
+    left = 344
+    top = 192
   end
 end

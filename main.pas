@@ -15,12 +15,22 @@ type
   { TFormMain }
 
   TFormMain = class(TForm)
-    TESTCMD: TButton;
+    pause: TButton;
+    set20A: TButton;
+    set16A: TButton;
+    set12A: TButton;
+    current_act: TLabel;
+    charging_time: TLabel;
+    current_set: TLabel;
+    energy: TLabel;
+    energy_total: TLabel;
+    temperature: TLabel;
+    set_10A: TButton;
     ButtonDiconnect: TButton;
     ButtonConnect: TButton;
     Connected: TImage;
     Error: TImage;
-    Label1: TLabel;
+    wallbox_state: TLabel;
     Standby: TImage;
     Ready: TImage;
     Charging: TImage;
@@ -35,9 +45,9 @@ type
     MemoText: TMemo;
     TimerUpdate: TTimer;
     TimerQuit: TTimer;
+    procedure pauseClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormPaint(Sender: TObject);
-    procedure ReadyClick(Sender: TObject);
     procedure LTCPComponentConnect(aSocket: TLSocket);
     procedure ConnectButtonClick(Sender: TObject);
     procedure DiconnectButtonClick(Sender: TObject);
@@ -50,15 +60,20 @@ type
     procedure MenuItemExitClick(Sender: TObject);
     procedure SendButtonClick(Sender: TObject);
     procedure SendEditKeyPress(Sender: TObject; var Key: char);
-    procedure TESTCMDClick(Sender: TObject);
+    procedure set12AClick(Sender: TObject);
+    procedure set16AClick(Sender: TObject);
+    procedure set20AClick(Sender: TObject);
+    procedure set_10AClick(Sender: TObject);
     procedure TimerQuitTimer(Sender: TObject);
     procedure TimerUpdateTimer(Sender: TObject);
+
+
   private
-    FNet: TLConnection;
     FIsServer: Boolean;
     FChargeStatus : TChargeStatus;
     procedure SendToAll(const aMsg: string);
     procedure SetChargeStatus(AValue: TChargeStatus);
+
   public
     property ChargeStatus:TChargeStatus read FChargeStatus write SetChargeStatus;
     { public declarations }
@@ -66,34 +81,106 @@ type
 
 var
   FormMain: TFormMain;
+  FNet: TLConnection;
   last_cmd: string;
   set_current: string;
   act_state: string;
   act_current: string;
   act_temp: string;
-  energy_session: string;
+  energy_ses: string;
   elapsed_time: string;
   energy_tot:string;
   temp: string;
+  WB_connected: Boolean;
+
+  function CRC(Data: AnsiString): AnsiString; // 8-bit XOR Checksum
+  function build_cmd_str(cmd_in: AnsiString): AnsiString; // generate command string
+  procedure send_cmd(str: AnsiString);
+  procedure MyDelay(milliSecondsDelay: int64);
+  procedure waitans();
+
 
 implementation
 
 uses
-  lCommon;
+  lCommon, DateUtils;
 
 { TFormMain }
 
+procedure TFormMain.FormCreate(Sender: TObject);
+begin
+  FNet := LTCP;
+  LTCP.SocketNet := LAF_INET;
+  if EditIP.Text = '::1' then
+    EditIP.Text := 'localhost';
+  FIsServer := False;
+  WB_connected := False;
+  last_cmd := '';
+  FChargeStatus := st_ready;
+  FNet.Connect(EditIP.Text, StrToInt(EditPort.Text)); // connect to wallbox
+end;
+
+
 procedure TFormMain.ConnectButtonClick(Sender: TObject);
 begin
-  if FNet.Connect(EditIP.Text, StrToInt(EditPort.Text)) then
-    FIsServer := False;
+  FNet.Connect(EditIP.Text, StrToInt(EditPort.Text))
 end;
 
 
 procedure TFormMain.LTCPComponentConnect(aSocket: TLSocket);
 begin
-  MemoText.Append('Connected to remote host');
+  MemoText.Append('Connected to Wallbox');
+  WB_connected := True;
 end;
+
+
+procedure TFormMain.LTcpComponentDisconnect(aSocket: TLSocket);
+begin
+  MemoText.Append('Wallbox connection lost');
+  WB_connected := False;
+end;
+
+
+procedure TFormMain.LTCPComponentError(const msg: string; aSocket: TLSocket);
+begin
+  MemoText.Append(msg);
+  MemoText.SelStart := Length(MemoText.Lines.Text);
+end;
+
+
+procedure TFormMain.SendToAll(const aMsg: string);
+var
+  n: Integer;
+begin
+   // TCP
+    FNet.IterReset; // start at server socket
+    while FNet.IterNext do begin // skip server socket, go to clients only
+      n := FNet.SendMessage(aMsg, FNet.Iterator);
+      if n < Length(aMsg) then
+        MemoText.Append('Error on send [' + IntToStr(n) + ']');
+    end;
+ end;
+
+
+procedure TFormMain.LTCPComponentAccept(aSocket: TLSocket);
+begin
+  MemoText.Append('Connection accepted');
+  MemoText.SelStart := Length(MemoText.Lines.Text);
+end;
+
+
+procedure TFormMain.MenuItemAboutClick(Sender: TObject);
+begin
+  MessageDlg('EVSE TCP Control V0.25',
+             mtInformation, [mbOK], 0);
+end;
+
+
+procedure TFormMain.MenuItemExitClick(Sender: TObject);
+begin
+  Close;
+end;
+
 
 procedure TFormMain.FormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
@@ -107,33 +194,19 @@ begin
 end;
 
 
-procedure TFormMain.FormPaint(Sender: TObject);
+procedure TFormMain.TimerQuitTimer(Sender: TObject);
 begin
-  //
-  Case ChargeStatus of
-    st_ready: Canvas.Draw(0,0,Ready.Picture.Bitmap);
-    st_connected: Canvas.Draw(0,0,Connected.Picture.Bitmap);
-    st_charging: Canvas.Draw(0,0,Charging.Picture.Bitmap);
-  end;
+  Close;
 end;
 
 
-
-procedure TFormMain.ReadyClick(Sender: TObject);
+procedure MyDelay(milliSecondsDelay: int64);
+var
+  stopTime : TDateTime;
 begin
-
-end;
-
-procedure TFormMain.LTCPComponentError(const msg: string; aSocket: TLSocket);
-begin
-  MemoText.Append(msg);
-  MemoText.SelStart := Length(MemoText.Lines.Text);
-end;
-
-procedure TFormMain.LTCPComponentAccept(aSocket: TLSocket);
-begin
-  MemoText.Append('Connection accepted');
-  MemoText.SelStart := Length(MemoText.Lines.Text);
+  stopTime := IncMilliSecond(Now,milliSecondsDelay);
+  while (Now < stopTime) and (not Application.Terminated) do
+    Application.ProcessMessages;
 end;
 
 
@@ -149,24 +222,12 @@ begin
  Result := IntToHex(iSum,2)
 end;
 
-
-procedure TFormMain.LTcpComponentDisconnect(aSocket: TLSocket);
+procedure send_cmd(str: AnsiString);
 begin
-  MemoText.Append('Connection lost');
-  MemoText.SelStart := Length(MemoText.Lines.Text);
+ last_cmd := str;
+ str := build_cmd_str(str);
+ FNet.SendMessage(str);
 end;
-
-procedure TFormMain.MenuItemAboutClick(Sender: TObject);
-begin
-  MessageDlg('EVSE TCP Control V0.01',
-             mtInformation, [mbOK], 0);
-end;
-
-procedure TFormMain.MenuItemExitClick(Sender: TObject);
-begin
-  Close;
-end;
-
 
 function build_cmd_str(cmd_in: AnsiString): AnsiString; // generate command string
 begin
@@ -174,9 +235,27 @@ begin
  Result := cmd_in + '^' + CRC(cmd_in) + #13;
 end;
 
+procedure waitans();
+begin
+  while (last_cmd <> '') and (not Application.Terminated) do Application.ProcessMessages;
+end;
 
 
-procedure TFormMain.SendButtonClick(Sender: TObject);
+procedure TFormMain.SetChargeStatus(AValue: TChargeStatus);
+begin
+  FChargeStatus:=AValue;
+ Refresh;
+end;
+
+
+procedure TFormMain.SendEditKeyPress(Sender: TObject; var Key: char);
+begin
+  if Key = #13 then
+    SendButtonClick(Sender);
+end;
+
+
+ procedure TFormMain.SendButtonClick(Sender: TObject);
 begin
   if Length(EditSend.Text) > 0 then begin
     if FNet.Connected then begin
@@ -189,14 +268,11 @@ begin
   end;
 end;
 
-procedure TFormMain.TESTCMDClick(Sender: TObject);
-var str : AnsiString;
+
+ procedure TFormMain.DiconnectButtonClick(Sender: TObject);
 begin
- str := 'SC 10';
- last_cmd := str;
- str := build_cmd_str(str);
- FNet.SendMessage(str);
- str := '';
+  FNet.Disconnect;
+  MemoText.Append('Disconnected');
 end;
 
 
@@ -205,20 +281,18 @@ var
   s,l,r,rec_cs,calc_cs,la,ppblock,cmd: string;
   pp: TStringArray;
   len: Int64;
+  n: Double;
+  stime,h,min,sec: integer;
 
 begin
   if aSocket.GetMessage(s) > 0 then begin
-    MemoText.Append(s);
+//    MemoText.Append(s);      // Debug only
 
-//    MemoText.Append(IntToStr(Length(s)));
     len := Length(s) - 4;    // Commando length without checksum
     l := LeftStr(s,len);     // Commando String $cc pp pp ...
     r := RightStr(s,3);      // Checksum String xk\r
     rec_cs := LeftStr(r,2);  // received Checksum String
     calc_cs := CRC(l);       // calculated Checksum String
-//    MemoText.Append(l);
-//    MemoText.Append(rec_cs);
-//    MemoText.Append(calc_cs);
     if rec_cs = calc_cs then  // Antwort verarbeiten
       begin
         case l of
@@ -250,31 +324,76 @@ begin
               ppblock := RightStr(l,len);
               pp := ppblock.Split(' ');            // array of parameters
               len := high(pp);                     // number of parameters
-              MemoText.Append(ppblock + ' received ' + IntToStr(len));
+//              MemoText.Append(ppblock + ' received ' + IntToStr(len));  // Debug only
               cmd := Leftstr(last_cmd,2);          // limit to command name
-              MemoText.Append('try ' + cmd);
               case cmd of
                  'SC':begin                        // set current
                    set_current := pp[1];
                    MemoText.Append('Current setting: ' +  set_current);
+                   last_cmd := '';
+                 end;
+                 'GE':begin                        // get set current
+                   set_current := pp[1];
+                   MemoText.Append('Current set: ' +  set_current);
+                   last_cmd := '';
                  end;
                  'GG':begin                        // get actual current
-                    act_current := pp[1];
-                    MemoText.Append('Current: ' +  act_current);
+                    n := StrToFloat(pp[1]);
+                    n := n/1000;
+                    act_current := Format('%4.2f',[n]);
+                    MemoText.Append('Current: ' +  act_current + ' A');
+                    last_cmd := '';
                  end;
                  'GS':begin                        // get actual state and elapsed time
                     act_state := pp[1];
-                    elapsed_time := pp[2];
+
+                    case act_state of              // wallbox state
+                         '1': begin
+                              MemoText.Append('Status: Bereit');
+                              ChargeStatus := st_ready;
+                         end;
+                         '2': begin
+                              MemoText.Append('Status: Verbunden');
+                              ChargeStatus := st_connected;
+                         end;
+                         '3': begin
+                              MemoText.Append('Status: Laden');
+                              ChargeStatus := st_charging;
+                         end;
+                         '4','5': begin
+                              MemoText.Append('Status: Fehler');
+                              ChargeStatus := st_error;
+                         end;
+                         '254': begin
+                              MemoText.Append('Status: Pause');
+                              ChargeStatus := st_standby;
+                         end;
+                    end;
+                    stime := StrToInt(pp[2]);            // elapsed time
+                    h := stime div 3600;
+                    sec := stime mod 60;
+                    min := (stime - (h*3600)) div 60;
+                    elapsed_time := Format('%.2d',[h]) + ':' + Format('%.2d',[min])  + ':' +  Format('%.2d',[sec]);
                     MemoText.Append('State: ' +  act_state + ' Session Time: ' + elapsed_time);
-                 end;
-                 'GP':begin                        // get temperature
-                    act_temp := pp[1];
-                    MemoText.Append('Temperature: ' +  act_temp);
-                 end;
+                    last_cmd := '';
+                  end;
+                  'GP':begin                        // get temperature
+                    n := StrToFloat(pp[1]);
+                    n := n/10;
+                    act_temp := FloatToStr(n);
+                    MemoText.Append('Temperature: ' +  act_temp +' °C');
+                    last_cmd := '';
+                  end;
                   'GU':begin                       // get energy usage
-                    energy_session := pp[1];
-                    energy_tot := pp[2];
-                    MemoText.Append('Energy Session: ' +  energy_session + ' Total: ' + energy_tot);
+                    n := StrToFloat(pp[1]);
+                    n := n/3600;                   // Ws -> Wh
+                    n := n/1000;                   // Wh -> kWh
+                    energy_ses := Format('%4.2f',[n]);
+                    n := StrToFloat(pp[2]);
+                    n := n/1000;                   // Wh -> kWh
+                    energy_tot := Format('%5.2f',[n]);
+                    MemoText.Append('Energy Session: ' +  energy_ses + ' kWh Total: ' + energy_tot + ' kWh');
+                    last_cmd := '';
                  end;
               end;
              end else  MemoText.Append('?????');
@@ -290,69 +409,135 @@ begin
   end;
 end;
 
-procedure TFormMain.DiconnectButtonClick(Sender: TObject);
-begin
-  FNet.Disconnect;
-  MemoText.Append('Disconnected');
-end;
 
-
-
-procedure TFormMain.FormCreate(Sender: TObject);
-begin
-  FNet := LTCP;
-  LTCP.SocketNet := LAF_INET;
-  if EditIP.Text = '::1' then
-    EditIP.Text := 'localhost';
-  FIsServer := False;
-  FChargeStatus := st_ready;
-end;
-
-
-procedure TFormMain.SendEditKeyPress(Sender: TObject; var Key: char);
-begin
-  if Key = #13 then
-    SendButtonClick(Sender);
-end;
-
-
-
-procedure TFormMain.TimerQuitTimer(Sender: TObject);
-begin
-  Close;
-end;
 
 procedure TFormMain.TimerUpdateTimer(Sender: TObject);
 begin
 
-//   testing only
+     current_set.caption := set_current + ' A';
+     temperature.caption := act_temp + ' °C';
+     current_act.caption := act_current + ' A';
+     energy_total.caption := energy_tot + ' kWh';
 
-     Label1.Caption := DateTimeToStr(now());
+     if  ChargeStatus = st_charging then begin
+       charging_time.caption := elapsed_time;
+       energy.caption := energy_ses + ' kWh';
+     end
+     else
+     begin
+       charging_time.caption := '--:--:--';
+       energy.caption := '00,00 kWh';
+     end;
 
-//   ChargeStatus := TChargeStatus(Ord(ChargeStatus)+1);
-//   if ChargeStatus=st_Invalid then
-//    ChargeStatus := st_Init;
+     if WB_connected then begin
+          Case ChargeStatus of
+                   st_ready: begin
+                      wallbox_state.Caption := ' Bereit         ';
+                   end;
+                   st_connected: begin
+                      wallbox_state.Caption := ' Verbunden      ';
+                   end;
+                   st_charging: begin
+                      wallbox_state.Caption := ' Laden          ';
+                   end;
+                   st_error: begin
+                      wallbox_state.Caption := ' Fehler         ';
+                   end;
+                   st_standby: begin
+                      wallbox_state.Caption := ' Pause          ';
+                   end;
+          end;
+     end
+     else
+     begin
+        wallbox_state.Caption := ' keine Wallbox  ';
+     end;
 
+     if WB_connected then begin // Wallbox connected ?
+        send_cmd('GE');         // get current setting
+        waitans();
+        send_cmd('GG');         // get charge current
+        waitans();
+        send_cmd('GP');         // get temperatur
+        waitans();
+        send_cmd('GS');         // get wallbox status
+        waitans();
+        send_cmd('GU');         // get energy usage
+     end;
 end;
 
-procedure TFormMain.SendToAll(const aMsg: string);
-var
-  n: Integer;
+
+procedure TFormMain.FormPaint(Sender: TObject);
 begin
-   // TCP
-    FNet.IterReset; // start at server socket
-    while FNet.IterNext do begin // skip server socket, go to clients only
-      n := FNet.SendMessage(aMsg, FNet.Iterator);
-      if n < Length(aMsg) then
-        MemoText.Append('Error on send [' + IntToStr(n) + ']');
-    end;
+
+  Case ChargeStatus of
+    st_ready: Canvas.Draw(300,10,Ready.Picture.Bitmap);
+    st_connected: Canvas.Draw(300,10,Connected.Picture.Bitmap);
+    st_charging: Canvas.Draw(300,10,Charging.Picture.Bitmap);
+  end;
+end;
+
+
+
+
+procedure TFormMain.set_10AClick(Sender: TObject);
+var str : AnsiString;
+begin
+ waitans();
+ str := 'SC 10';
+ last_cmd := str;
+ str := build_cmd_str(str);
+ FNet.SendMessage(str);
+end;
+
+
+procedure TFormMain.set12AClick(Sender: TObject);
+var str : AnsiString;
+begin
+ waitans();
+ str := 'SC 12';
+ last_cmd := str;
+ str := build_cmd_str(str);
+ FNet.SendMessage(str);
+end;
+
+
+procedure TFormMain.set16AClick(Sender: TObject);
+var str : AnsiString;
+begin
+ waitans();
+ str := 'SC 16';
+ last_cmd := str;
+ str := build_cmd_str(str);
+ FNet.SendMessage(str);
+end;
+
+procedure TFormMain.set20AClick(Sender: TObject);
+var str : AnsiString;
+begin
+ waitans();
+ str := 'SC 16';
+ last_cmd := str;
+ str := build_cmd_str(str);
+ FNet.SendMessage(str);
+end;
+
+procedure TFormMain.pauseClick(Sender: TObject);
+var str : AnsiString;
+begin
+
+ if ChargeStatus = st_standby then begin
+    str := 'FE';
+ end
+ else begin
+    str := 'FS';
  end;
-
-procedure TFormMain.SetChargeStatus(AValue: TChargeStatus);
-begin
-  FChargeStatus:=AValue;
-  Refresh;
+ waitans();
+ last_cmd := str;
+ str := build_cmd_str(str);
+ FNet.SendMessage(str);
 end;
+
 
 initialization
   {$I main.lrs}
