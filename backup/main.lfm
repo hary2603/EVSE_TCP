@@ -1,7 +1,7 @@
 object FormMain: TFormMain
-  Left = 0
+  Left = 906
   Height = 426
-  Top = 0
+  Top = 423
   Width = 390
   HorzScrollBar.Page = 377
   HorzScrollBar.Range = 377
@@ -433,13 +433,22 @@ object FormMain: TFormMain
     TabOrder = 10
   end
   object pause: TButton
-    Left = 37
+    Left = 36
     Height = 26
     Top = 152
-    Width = 316
+    Width = 158
     Caption = 'Pause'
     OnClick = pauseClick
     TabOrder = 11
+  end
+  object set_dark: TButton
+    Left = 200
+    Height = 25
+    Top = 152
+    Width = 154
+    Caption = 'Sperren'
+    OnClick = set_darkClick
+    TabOrder = 12
   end
   object LTCP: TLTCPComponent
     Port = 0
@@ -450,19 +459,19 @@ object FormMain: TFormMain
     OnAccept = LTCPComponentAccept
     Timeout = 0
     ReuseAddress = True
-    left = 224
-    top = 192
+    left = 8
+    top = 264
   end
   object TimerQuit: TTimer
     Enabled = False
     Interval = 200
     OnTimer = TimerQuitTimer
-    left = 264
-    top = 192
+    left = 248
+    top = 392
   end
   object TimerUpdate: TTimer
     OnTimer = TimerUpdateTimer
-    left = 304
-    top = 192
+    left = 288
+    top = 392
   end
 end

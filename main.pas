@@ -10,11 +10,12 @@ uses
 
 type
 
-  TChargeStatus = (st_Init,st_ready,st_connected,st_charging,st_error,st_standby,st_Invalid);
+  TChargeStatus = (st_Init,st_ready,st_connected,st_charging,st_error,st_standby,st_locked,st_Invalid);
 
   { TFormMain }
 
   TFormMain = class(TForm)
+    set_dark: TButton;
     pause: TButton;
     set20A: TButton;
     set16A: TButton;
@@ -64,6 +65,7 @@ type
     procedure set16AClick(Sender: TObject);
     procedure set20AClick(Sender: TObject);
     procedure set_10AClick(Sender: TObject);
+    procedure set_darkClick(Sender: TObject);
     procedure TimerQuitTimer(Sender: TObject);
     procedure TimerUpdateTimer(Sender: TObject);
 
@@ -316,6 +318,10 @@ begin
                 MemoText.Append('Status: Pause');
                 ChargeStatus := st_standby;
            end;
+           '$ST ff': begin
+                MemoText.Append('Status: Gesperrt');
+                ChargeStatus := st_locked;
+           end;
            otherwise begin
              la := LeftStr(l,3);
              if la = '$OK' then begin              // OK -> parse answer
@@ -333,7 +339,10 @@ begin
                      last_cmd := '';
                    end;
                  end;
-                 'FE','FS':begin                   // EVSE enable/sleep
+                 'FE','FD','FS':begin              // EVSE enable/disable/sleep
+                    last_cmd := '';
+                 end;
+                 'FB':begin                        // Display backlight 0 ... OFF
                     last_cmd := '';
                  end;
                  'GE':begin                        // get set current
@@ -375,6 +384,10 @@ begin
                          '254': begin
                               MemoText.Append('Status: Pause');
                               ChargeStatus := st_standby;
+                         end;
+                         '255': begin
+                              MemoText.Append('Status: Gesperrt');
+                              ChargeStatus := st_locked;
                          end;
                       end;
                       stime := StrToInt(pp[2]);            // elapsed time
@@ -464,6 +477,9 @@ begin
                    st_standby: begin
                       wallbox_state.Caption := ' Pause          ';
                    end;
+                   st_locked: begin
+                      wallbox_state.Caption := ' Gesperrt       ';
+                   end;
           end;
      end
      else
@@ -540,6 +556,19 @@ begin
  str := build_cmd_str(str);
  FNet.SendMessage(str);
 end;
+
+
+procedure TFormMain.set_darkClick(Sender: TObject);
+begin
+  if WB_connected then begin // Wallbox connected ?
+     waitans();
+     send_cmd('FD');         // Lock Wallbox
+     waitans();
+     send_cmd('FB 0');       // Display Backlight off
+   end;
+end;
+
+
 
 procedure TFormMain.pauseClick(Sender: TObject);
 var str : AnsiString;
