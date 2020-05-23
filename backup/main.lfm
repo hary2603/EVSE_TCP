@@ -1,7 +1,7 @@
 object FormMain: TFormMain
-  Left = 2235
-  Height = 461
-  Top = 166
+  Left = 0
+  Height = 426
+  Top = 0
   Width = 390
   HorzScrollBar.Page = 377
   HorzScrollBar.Range = 377
@@ -10,7 +10,7 @@ object FormMain: TFormMain
   ActiveControl = EditPort
   BorderWidth = 1
   Caption = 'EVSE CONTROL'
-  ClientHeight = 461
+  ClientHeight = 426
   ClientWidth = 390
   Constraints.MaxWidth = 390
   Constraints.MinHeight = 400
@@ -22,16 +22,16 @@ object FormMain: TFormMain
   object LabelPort: TLabel
     Left = 37
     Height = 13
-    Top = 222
+    Top = 224
     Width = 24
     Caption = 'Port:'
     ParentColor = False
     ParentFont = False
   end
   object LabelHostName: TLabel
-    Left = 37
+    Left = 32
     Height = 13
-    Top = 195
+    Top = 192
     Width = 52
     Caption = 'Hostname:'
     ParentColor = False
@@ -39,19 +39,18 @@ object FormMain: TFormMain
   end
   object MemoText: TMemo
     Left = 40
-    Height = 141
+    Height = 93
     Top = 251
-    Width = 280
+    Width = 286
     Enabled = False
     ParentFont = False
     ReadOnly = True
-    ScrollBars = ssAutoBoth
     TabOrder = 0
   end
   object ButtonSend: TButton
-    Left = 245
+    Left = 248
     Height = 25
-    Top = 400
+    Top = 352
     Width = 75
     BorderSpacing.InnerBorder = 4
     Caption = 'Send'
@@ -60,9 +59,9 @@ object FormMain: TFormMain
     TabOrder = 1
   end
   object EditSend: TEdit
-    Left = 40
+    Left = 37
     Height = 21
-    Top = 400
+    Top = 352
     Width = 200
     OnKeyPress = SendEditKeyPress
     ParentFont = False
@@ -71,7 +70,7 @@ object FormMain: TFormMain
   object ButtonConnect: TButton
     Left = 40
     Height = 25
-    Top = 431
+    Top = 392
     Width = 75
     BorderSpacing.InnerBorder = 4
     Caption = 'Connect'
@@ -82,7 +81,7 @@ object FormMain: TFormMain
   object ButtonDiconnect: TButton
     Left = 128
     Height = 25
-    Top = 431
+    Top = 391
     Width = 104
     BorderSpacing.InnerBorder = 4
     Caption = 'Disconnect'
@@ -91,27 +90,27 @@ object FormMain: TFormMain
     TabOrder = 4
   end
   object EditPort: TEdit
-    Left = 117
+    Left = 120
     Height = 21
-    Top = 219
-    Width = 59
+    Top = 216
+    Width = 64
     ParentFont = False
     TabOrder = 5
     Text = '10000'
   end
   object EditIP: TEdit
-    Left = 117
+    Left = 119
     Height = 21
-    Top = 192
-    Width = 123
+    Top = 182
+    Width = 95
     ParentFont = False
     TabOrder = 6
     Text = '10.0.0.170'
   end
   object Status: TImage
-    Left = 279
+    Left = 336
     Height = 24
-    Top = 432
+    Top = 392
     Width = 24
     Picture.Data = {
       1754506F727461626C654E6574776F726B477261706869639301000089504E47
@@ -133,9 +132,9 @@ object FormMain: TFormMain
     Visible = False
   end
   object Charging: TImage
-    Left = 334
+    Left = 336
     Height = 32
-    Top = 344
+    Top = 272
     Width = 40
     Picture.Data = {
       1754506F727461626C654E6574776F726B477261706869636002000089504E47
@@ -165,7 +164,7 @@ object FormMain: TFormMain
   object Ready: TImage
     Left = 336
     Height = 32
-    Top = 256
+    Top = 192
     Width = 40
     Picture.Data = {
       1754506F727461626C654E6574776F726B477261706869632D02000089504E47
@@ -194,7 +193,7 @@ object FormMain: TFormMain
   object Connected: TImage
     Left = 336
     Height = 32
-    Top = 304
+    Top = 232
     Width = 40
     Picture.Data = {
       1754506F727461626C654E6574776F726B477261706869634602000089504E47
@@ -224,7 +223,7 @@ object FormMain: TFormMain
   object Error: TImage
     Left = 336
     Height = 32
-    Top = 384
+    Top = 312
     Width = 40
     Picture.Data = {
       1754506F727461626C654E6574776F726B477261706869635F03000089504E47
@@ -268,9 +267,9 @@ object FormMain: TFormMain
     TabOrder = 7
   end
   object Standby: TImage
-    Left = 334
+    Left = 336
     Height = 32
-    Top = 426
+    Top = 352
     Width = 40
     Picture.Data = {
       1754506F727461626C654E6574776F726B47726170686963D101000089504E47
@@ -312,7 +311,7 @@ object FormMain: TFormMain
   object current_act: TLabel
     Left = 143
     Height = 23
-    Top = 40
+    Top = 48
     Width = 73
     Caption = '10.30 A'
     Font.CharSet = ANSI_CHARSET
@@ -328,7 +327,7 @@ object FormMain: TFormMain
   object current_set: TLabel
     Left = 143
     Height = 23
-    Top = 80
+    Top = 75
     Width = 43
     Caption = '10 A'
     Font.CharSet = ANSI_CHARSET
@@ -344,7 +343,7 @@ object FormMain: TFormMain
   object energy: TLabel
     Left = 239
     Height = 23
-    Top = 40
+    Top = 48
     Width = 103
     Caption = '00.00 kWh'
     Font.CharSet = ANSI_CHARSET
@@ -354,13 +353,14 @@ object FormMain: TFormMain
     Font.Pitch = fpVariable
     Font.Quality = fqDraft
     Font.Style = [fsBold]
+    ParentBidiMode = False
     ParentColor = False
     ParentFont = False
   end
   object energy_total: TLabel
     Left = 227
     Height = 23
-    Top = 80
+    Top = 75
     Width = 115
     Caption = '000.00 kWh'
     Font.CharSet = ANSI_CHARSET
@@ -376,7 +376,7 @@ object FormMain: TFormMain
   object temperature: TLabel
     Left = 37
     Height = 23
-    Top = 80
+    Top = 75
     Width = 71
     Caption = '00.0 °C'
     Font.CharSet = ANSI_CHARSET
@@ -392,7 +392,7 @@ object FormMain: TFormMain
   object charging_time: TLabel
     Left = 37
     Height = 23
-    Top = 40
+    Top = 48
     Width = 86
     Caption = '00:00:00'
     Font.CharSet = ANSI_CHARSET
@@ -450,19 +450,19 @@ object FormMain: TFormMain
     OnAccept = LTCPComponentAccept
     Timeout = 0
     ReuseAddress = True
-    left = 248
+    left = 224
     top = 192
   end
   object TimerQuit: TTimer
     Enabled = False
     Interval = 200
     OnTimer = TimerQuitTimer
-    left = 288
+    left = 264
     top = 192
   end
   object TimerUpdate: TTimer
     OnTimer = TimerUpdateTimer
-    left = 344
+    left = 304
     top = 192
   end
 end

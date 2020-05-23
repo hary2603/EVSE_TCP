@@ -116,7 +116,7 @@ begin
   FIsServer := False;
   WB_connected := False;
   last_cmd := '';
-  FChargeStatus := st_ready;
+  FChargeStatus := st_init;
   FNet.Connect(EditIP.Text, StrToInt(EditPort.Text)); // connect to wallbox
 end;
 
@@ -317,37 +317,45 @@ begin
                 ChargeStatus := st_standby;
            end;
            otherwise begin
-           la := LeftStr(l,3);
-           if la = '$OK' then
-             begin
-              len := Length(l) - 3;
-              ppblock := RightStr(l,len);
-              pp := ppblock.Split(' ');            // array of parameters
-              len := high(pp);                     // number of parameters
-//              MemoText.Append(ppblock + ' received ' + IntToStr(len));  // Debug only
-              cmd := Leftstr(last_cmd,2);          // limit to command name
-              case cmd of
+             la := LeftStr(l,3);
+             if la = '$OK' then begin
+                len := Length(l) - 3;
+                ppblock := RightStr(l,len);
+                pp := ppblock.Split(' ');          // array of parameters
+                len := high(pp);                   // number of parameters
+                MemoText.Append(ppblock + ' received ' + IntToStr(len));  // Debug only
+                cmd := Leftstr(last_cmd,2);        // limit to command name
+                case cmd of
                  'SC':begin                        // set current
-                   set_current := pp[1];
-                   MemoText.Append('Current setting: ' +  set_current + ' A');
-                   last_cmd := '';
+                   if len = 1 then begin
+                     set_current := pp[1];
+                     MemoText.Append('Current setting: ' +  set_current + ' A');
+                     last_cmd := '';
+                   end;
                  end;
-                 'GE':begin                        // get set current
-                   set_current := pp[1];
-                   MemoText.Append('Current set: ' +  set_current + ' A');
-                   last_cmd := '';
-                 end;
-                 'GG':begin                        // get actual current
-                    n := StrToFloat(pp[1]);
-                    n := n/1000;
-                    act_current := Format('%4.2f',[n]);
-                    MemoText.Append('Current: ' +  act_current + ' A');
+                 'FE','FS':begin                   // EVSE enable/sleep
                     last_cmd := '';
                  end;
+                 'GE':begin                        // get set current
+                   if len = 2 then begin
+                     set_current := pp[1];
+                     MemoText.Append('Current set: ' +  set_current + ' A');
+                     last_cmd := '';
+                   end;
+                 end;
+                 'GG':begin                        // get actual current
+                    if len = 2 then begin
+                      n := StrToFloat(pp[1]);
+                      n := n/1000;
+                      act_current := Format('%4.2f',[n]);
+                      MemoText.Append('Current: ' +  act_current + ' A');
+                      last_cmd := '';
+                   end;
+                 end;
                  'GS':begin                        // get actual state and elapsed time
-                    act_state := pp[1];
-
-                    case act_state of              // wallbox state
+                    if len = 2 then begin
+                      act_state := pp[1];
+                      case act_state of              // wallbox state
                          '1': begin
                               MemoText.Append('Status: Bereit');
                               ChargeStatus := st_ready;
@@ -368,41 +376,50 @@ begin
                               MemoText.Append('Status: Pause');
                               ChargeStatus := st_standby;
                          end;
+                      end;
+                      stime := StrToInt(pp[2]);            // elapsed time
+                      h  := stime div 3600;
+                      sec := stime mod 60;
+                      min := (stime - (h*3600)) div 60;
+                      elapsed_time := Format('%.2d',[h]) + ':' + Format('%.2d',[min])  + ':' +  Format('%.2d',[sec]);
+                      MemoText.Append('State: ' +  act_state + ' Session Time: ' + elapsed_time);
+                      last_cmd := '';
                     end;
-                    stime := StrToInt(pp[2]);            // elapsed time
-                    h := stime div 3600;
-                    sec := stime mod 60;
-                    min := (stime - (h*3600)) div 60;
-                    elapsed_time := Format('%.2d',[h]) + ':' + Format('%.2d',[min])  + ':' +  Format('%.2d',[sec]);
-                    MemoText.Append('State: ' +  act_state + ' Session Time: ' + elapsed_time);
-                    last_cmd := '';
                   end;
-                  'GP':begin                        // get temperature
-                    n := StrToFloat(pp[1]);
-                    n := n/10;
-                    act_temp := FloatToStr(n);
-                    MemoText.Append('Temperature: ' +  act_temp +' °C');
-                    last_cmd := '';
+                 'GP':begin                        // get temperature
+                    if len = 3 then begin
+                      n := StrToFloat(pp[1]);
+                      n := n/10;
+                      act_temp := FloatToStr(n);
+                      MemoText.Append('Temperature: ' +  act_temp +' °C');
+                      last_cmd := '';
+                    end;
                   end;
-                  'GU':begin                       // get energy usage
-                    n := StrToFloat(pp[1]);
-                    n := n/3600;                   // Ws -> Wh
-                    n := n/1000;                   // Wh -> kWh
-                    energy_ses := Format('%4.2f',[n]);
-                    n := StrToFloat(pp[2]);
-                    n := n/1000;                   // Wh -> kWh
-                    energy_tot := Format('%5.2f',[n]);
-                    MemoText.Append('Energy Session: ' +  energy_ses + ' kWh Total: ' + energy_tot + ' kWh');
-                    last_cmd := '';
+                 'GU':begin                        // get energy usage
+                    if len = 2 then begin
+                      n := StrToFloat(pp[1]);
+                      n := n/3600;                   // Ws -> Wh
+                      n := n/1000;                   // Wh -> kWh
+                      energy_ses := Format('%4.2f',[n]);
+                      n := StrToFloat(pp[2]);
+                      n := n/1000;                   // Wh -> kWh
+                      energy_tot := Format('%5.2f',[n]);
+                      MemoText.Append('Energy Session: ' +  energy_ses + ' kWh Total: ' + energy_tot + ' kWh');
+                      last_cmd := '';
+                    end;
                  end;
-              end;
-             end else  MemoText.Append('?????');
-           end;
+                end;
+              end else begin
+                MemoText.Append('$NK received ....');
+                last_cmd := '';  // abandon last command
+             end;
+          end;
         end;
       end
     else
      begin
        MemoText.Append('Checksum error....');
+       last_cmd := '';  // abandon last command
      end;
 
     MemoText.SelStart := Length(MemoText.Lines.Text);
@@ -454,13 +471,14 @@ begin
      end;
 
      if WB_connected then begin // Wallbox connected ?
-        send_cmd('GE');         // get current setting
+        waitans();
+        send_cmd('GS');         // get wallbox status
         waitans();
         send_cmd('GG');         // get charge current
         waitans();
         send_cmd('GP');         // get temperatur
         waitans();
-        send_cmd('GS');         // get wallbox status
+        send_cmd('GE');         // get current setting
         waitans();
         send_cmd('GU');         // get energy usage
      end;

@@ -6,3 +6,4 @@ Exec=/home/pi/projekte/evse_tcp/EVSE_CLIENT
 Encoding=UTF-8
 Terminal=false
 Categories=None;
+
