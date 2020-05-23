@@ -329,12 +329,12 @@ begin
               case cmd of
                  'SC':begin                        // set current
                    set_current := pp[1];
-                   MemoText.Append('Current setting: ' +  set_current);
+                   MemoText.Append('Current setting: ' +  set_current + ' A');
                    last_cmd := '';
                  end;
                  'GE':begin                        // get set current
                    set_current := pp[1];
-                   MemoText.Append('Current set: ' +  set_current);
+                   MemoText.Append('Current set: ' +  set_current + ' A');
                    last_cmd := '';
                  end;
                  'GG':begin                        // get actual current

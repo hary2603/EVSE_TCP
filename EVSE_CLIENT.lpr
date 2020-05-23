@@ -7,6 +7,8 @@ uses
   Forms
   { add your units here }, main;
 
+{$R *.res}
+
 begin
   Application.Title:='EVSE_TCPIP_IF';
   Application.Initialize;

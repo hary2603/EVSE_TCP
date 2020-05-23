@@ -1,7 +1,7 @@
 object FormMain: TFormMain
-  Left = 2235
+  Left = 0
   Height = 461
-  Top = 166
+  Top = 0
   Width = 390
   HorzScrollBar.Page = 377
   HorzScrollBar.Range = 377
@@ -18,21 +18,21 @@ object FormMain: TFormMain
   OnClose = FormClose
   OnCreate = FormCreate
   OnPaint = FormPaint
-  LCLVersion = '2.0.8.0'
+  LCLVersion = '2.0.6.0'
   object LabelPort: TLabel
     Left = 37
-    Height = 13
+    Height = 22
     Top = 222
-    Width = 24
+    Width = 32
     Caption = 'Port:'
     ParentColor = False
     ParentFont = False
   end
   object LabelHostName: TLabel
     Left = 37
-    Height = 13
+    Height = 22
     Top = 195
-    Width = 52
+    Width = 76
     Caption = 'Hostname:'
     ParentColor = False
     ParentFont = False
@@ -61,7 +61,7 @@ object FormMain: TFormMain
   end
   object EditSend: TEdit
     Left = 40
-    Height = 21
+    Height = 32
     Top = 400
     Width = 200
     OnKeyPress = SendEditKeyPress
@@ -92,7 +92,7 @@ object FormMain: TFormMain
   end
   object EditPort: TEdit
     Left = 117
-    Height = 21
+    Height = 32
     Top = 219
     Width = 59
     ParentFont = False
@@ -101,7 +101,7 @@ object FormMain: TFormMain
   end
   object EditIP: TEdit
     Left = 117
-    Height = 21
+    Height = 32
     Top = 192
     Width = 123
     ParentFont = False
@@ -313,7 +313,7 @@ object FormMain: TFormMain
     Left = 143
     Height = 23
     Top = 40
-    Width = 73
+    Width = 81
     Caption = '10.30 A'
     Font.CharSet = ANSI_CHARSET
     Font.Color = clBlack
@@ -329,7 +329,7 @@ object FormMain: TFormMain
     Left = 143
     Height = 23
     Top = 80
-    Width = 43
+    Width = 48
     Caption = '10 A'
     Font.CharSet = ANSI_CHARSET
     Font.Color = clBlack
@@ -345,7 +345,7 @@ object FormMain: TFormMain
     Left = 239
     Height = 23
     Top = 40
-    Width = 103
+    Width = 114
     Caption = '00.00 kWh'
     Font.CharSet = ANSI_CHARSET
     Font.Color = clBlack
@@ -361,7 +361,7 @@ object FormMain: TFormMain
     Left = 227
     Height = 23
     Top = 80
-    Width = 115
+    Width = 127
     Caption = '000.00 kWh'
     Font.CharSet = ANSI_CHARSET
     Font.Color = clBlack
@@ -377,7 +377,7 @@ object FormMain: TFormMain
     Left = 37
     Height = 23
     Top = 80
-    Width = 71
+    Width = 77
     Caption = '00.0 °C'
     Font.CharSet = ANSI_CHARSET
     Font.Color = clBlack
@@ -393,7 +393,7 @@ object FormMain: TFormMain
     Left = 37
     Height = 23
     Top = 40
-    Width = 86
+    Width = 94
     Caption = '00:00:00'
     Font.CharSet = ANSI_CHARSET
     Font.Color = clBlack

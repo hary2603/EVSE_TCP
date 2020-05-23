@@ -1,6 +1,6 @@
 object FormMain: TFormMain
   Left = 2235
-  Height = 428
+  Height = 461
   Top = 166
   Width = 390
   HorzScrollBar.Page = 377
@@ -10,7 +10,7 @@ object FormMain: TFormMain
   ActiveControl = EditPort
   BorderWidth = 1
   Caption = 'EVSE CONTROL'
-  ClientHeight = 428
+  ClientHeight = 461
   ClientWidth = 390
   Constraints.MaxWidth = 390
   Constraints.MinHeight = 400
@@ -71,7 +71,7 @@ object FormMain: TFormMain
   object ButtonConnect: TButton
     Left = 40
     Height = 25
-    Top = 433
+    Top = 431
     Width = 75
     BorderSpacing.InnerBorder = 4
     Caption = 'Connect'
@@ -82,7 +82,7 @@ object FormMain: TFormMain
   object ButtonDiconnect: TButton
     Left = 128
     Height = 25
-    Top = 433
+    Top = 431
     Width = 104
     BorderSpacing.InnerBorder = 4
     Caption = 'Disconnect'
