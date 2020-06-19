@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, LResources, Forms, Controls, Graphics, Dialogs,
-  StdCtrls, Buttons, ExtCtrls, Menus, lNetComponents, lNet;
+  StdCtrls, Buttons, ExtCtrls, Menus, ComCtrls, lNetComponents, lNet;
 
 type
 
@@ -15,37 +15,42 @@ type
   { TFormMain }
 
   TFormMain = class(TForm)
-    set_dark: TButton;
-    pause: TButton;
-    set20A: TButton;
-    set16A: TButton;
-    set12A: TButton;
-    current_act: TLabel;
+    ButtonConnect: TButton;
+    ButtonDiconnect: TButton;
+    ButtonSend: TButton;
     charging_time: TLabel;
+    current_act: TLabel;
     current_set: TLabel;
+    EditIP: TEdit;
+    EditPort: TEdit;
+    EditSend: TEdit;
     energy: TLabel;
     energy_total: TLabel;
-    temperature: TLabel;
+    LabelHostName: TLabel;
+    LabelPort: TLabel;
+    MemoText: TMemo;
+    PageControl1: TPageControl;
+    pause: TButton;
+    set12A: TButton;
+    set16A: TButton;
+    set20A: TButton;
     set_10A: TButton;
-    ButtonDiconnect: TButton;
-    ButtonConnect: TButton;
+    set_dark: TButton;
+    TabSheet1: TTabSheet;
     Connected: TImage;
     Error: TImage;
-    wallbox_state: TLabel;
     Standby: TImage;
     Ready: TImage;
     Charging: TImage;
     Status: TImage;
     LTCP: TLTCPComponent;
-    EditPort: TEdit;
-    EditIP: TEdit;
-    LabelPort: TLabel;
-    LabelHostName: TLabel;
-    ButtonSend: TButton;
-    EditSend: TEdit;
-    MemoText: TMemo;
+    TabSheet2: TTabSheet;
+    TabSheet3: TTabSheet;
+    temperature: TLabel;
     TimerUpdate: TTimer;
     TimerQuit: TTimer;
+    wallbox_state: TLabel;
+    procedure FormMainSizeConstraintsChange(Sender: TObject);
     procedure pauseClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormPaint(Sender: TObject);
@@ -504,14 +509,12 @@ end;
 
 procedure TFormMain.FormPaint(Sender: TObject);
 begin
-
   Case ChargeStatus of
-    st_ready: Canvas.Draw(300,10,Ready.Picture.Bitmap);
-    st_connected: Canvas.Draw(300,10,Connected.Picture.Bitmap);
-    st_charging: Canvas.Draw(300,10,Charging.Picture.Bitmap);
+    st_ready: Canvas.Draw(300,200,Ready.Picture.Bitmap);
+    st_connected: Canvas.Draw(300,200,Connected.Picture.Bitmap);
+    st_charging: Canvas.Draw(300,200,Charging.Picture.Bitmap);
   end;
 end;
-
 
 
 
@@ -584,6 +587,11 @@ begin
  last_cmd := str;
  str := build_cmd_str(str);
  FNet.SendMessage(str);
+end;
+
+procedure TFormMain.FormMainSizeConstraintsChange(Sender: TObject);
+begin
+
 end;
 
 

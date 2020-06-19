@@ -7,7 +7,9 @@
       <Unit0>
         <Filename Value="EVSE_CLIENT.lpr"/>
         <IsPartOfProject Value="True"/>
-        <UsageCount Value="66"/>
+        <CursorPos X="45" Y="18"/>
+        <UsageCount Value="70"/>
+        <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="main.pas"/>
@@ -16,13 +18,12 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="527"/>
-        <CursorPos X="54" Y="567"/>
-        <FoldState Value=" T0ngL335124242411x"/>
-        <UsageCount Value="66"/>
+        <EditorIndex Value="1"/>
+        <CursorPos X="50" Y="23"/>
+        <UsageCount Value="70"/>
         <Bookmarks Count="2">
-          <Item0 Y="205" ID="1"/>
-          <Item1 Y="260" ID="2"/>
+          <Item0 Y="210" ID="1"/>
+          <Item1 Y="265" ID="2"/>
         </Bookmarks>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -30,143 +31,20 @@
       <Unit2>
         <Filename Value="C:\Users\User\AppData\Local\lazarus\onlinepackagemanager\packages\lnet\lib\lnet.pp"/>
         <UnitName Value="lNet"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1528"/>
         <CursorPos Y="1557"/>
-        <UsageCount Value="12"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="13"/>
       </Unit2>
       <Unit3>
         <Filename Value="C:\Users\User\AppData\Local\lazarus\onlinepackagemanager\packages\lnet\lazaruspackage\lclwineventer.inc"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="25"/>
         <CursorPos Y="51"/>
-        <UsageCount Value="12"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="13"/>
       </Unit3>
     </Units>
-    <JumpHistory Count="30" HistoryIndex="29">
-      <Position1>
-        <Filename Value="main.pas"/>
-        <Caret Line="327" TopLine="305"/>
-      </Position1>
-      <Position2>
-        <Filename Value="main.pas"/>
-        <Caret Line="467" Column="19" TopLine="434"/>
-      </Position2>
-      <Position3>
-        <Filename Value="main.pas"/>
-        <Caret Line="329" TopLine="307"/>
-      </Position3>
-      <Position4>
-        <Filename Value="main.pas"/>
-        <Caret Line="354" TopLine="332"/>
-      </Position4>
-      <Position5>
-        <Filename Value="main.pas"/>
-        <Caret Line="355" TopLine="332"/>
-      </Position5>
-      <Position6>
-        <Filename Value="main.pas"/>
-        <Caret Line="356" TopLine="332"/>
-      </Position6>
-      <Position7>
-        <Filename Value="main.pas"/>
-        <Caret Line="366" TopLine="332"/>
-      </Position7>
-      <Position8>
-        <Filename Value="main.pas"/>
-        <Caret Line="367" TopLine="332"/>
-      </Position8>
-      <Position9>
-        <Filename Value="main.pas"/>
-        <Caret Line="356" TopLine="332"/>
-      </Position9>
-      <Position10>
-        <Filename Value="main.pas"/>
-        <Caret Line="378" TopLine="332"/>
-      </Position10>
-      <Position11>
-        <Filename Value="main.pas"/>
-        <Caret Line="379" TopLine="332"/>
-      </Position11>
-      <Position12>
-        <Filename Value="main.pas"/>
-        <Caret Line="380" TopLine="332"/>
-      </Position12>
-      <Position13>
-        <Filename Value="main.pas"/>
-        <Caret Line="381" TopLine="332"/>
-      </Position13>
-      <Position14>
-        <Filename Value="main.pas"/>
-        <Caret Line="382" TopLine="333"/>
-      </Position14>
-      <Position15>
-        <Filename Value="main.pas"/>
-        <Caret Line="383" TopLine="334"/>
-      </Position15>
-      <Position16>
-        <Filename Value="main.pas"/>
-        <Caret Line="384" TopLine="335"/>
-      </Position16>
-      <Position17>
-        <Filename Value="main.pas"/>
-        <Caret Line="329" TopLine="307"/>
-      </Position17>
-      <Position18>
-        <Filename Value="main.pas"/>
-        <Caret Line="418" TopLine="396"/>
-      </Position18>
-      <Position19>
-        <Filename Value="main.pas"/>
-        <Caret Line="287" TopLine="264"/>
-      </Position19>
-      <Position20>
-        <Filename Value="main.pas"/>
-        <Caret Line="420" TopLine="398"/>
-      </Position20>
-      <Position21>
-        <Filename Value="C:\Users\User\AppData\Local\lazarus\onlinepackagemanager\packages\lnet\lib\lnet.pp"/>
-        <Caret Line="1087" TopLine="1064"/>
-      </Position21>
-      <Position22>
-        <Filename Value="C:\Users\User\AppData\Local\lazarus\onlinepackagemanager\packages\lnet\lib\lnet.pp"/>
-        <Caret Line="1551" TopLine="1528"/>
-      </Position22>
-      <Position23>
-        <Filename Value="C:\Users\User\AppData\Local\lazarus\onlinepackagemanager\packages\lnet\lib\lnet.pp"/>
-        <Caret Line="1557" TopLine="1528"/>
-      </Position23>
-      <Position24>
-        <Filename Value="C:\Users\User\AppData\Local\lazarus\onlinepackagemanager\packages\lnet\lazaruspackage\lclwineventer.inc"/>
-        <Caret Line="48" TopLine="25"/>
-      </Position24>
-      <Position25>
-        <Filename Value="C:\Users\User\AppData\Local\lazarus\onlinepackagemanager\packages\lnet\lazaruspackage\lclwineventer.inc"/>
-        <Caret Line="51" TopLine="25"/>
-      </Position25>
-      <Position26>
-        <Filename Value="main.pas"/>
-        <Caret Line="467" Column="9" TopLine="442"/>
-      </Position26>
-      <Position27>
-        <Filename Value="main.pas"/>
-        <Caret Line="414" Column="9" TopLine="317"/>
-      </Position27>
-      <Position28>
-        <Filename Value="main.pas"/>
-        <Caret Line="343" Column="82" TopLine="298"/>
-      </Position28>
-      <Position29>
-        <Filename Value="main.pas"/>
-        <Caret Line="345" Column="22" TopLine="324"/>
-      </Position29>
-      <Position30>
-        <Filename Value="main.pas"/>
-        <Caret Line="347" Column="22" TopLine="326"/>
-      </Position30>
-    </JumpHistory>
+    <JumpHistory HistoryIndex="-1"/>
     <RunParams>
       <FormatVersion Value="2"/>
       <Modes Count="0" ActiveMode="default"/>
